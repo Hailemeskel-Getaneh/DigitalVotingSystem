@@ -79,6 +79,7 @@ digital_voting/
       ./digital_voting_system
       ```
     - Follow the on-screen instructions to register as a voter, vote, or access the admin menu.
+    -Even if it must be secured let me tell you admin password which is admin123. since it  helps you running the program.
 
 ## Team Members
 
