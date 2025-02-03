@@ -190,7 +190,9 @@ void adminMenu(sqlite3* db) {
         cout << "Incorrect password.\n";
         return;
     }
+
     int choice;
+    
     while (true) {
         cout << "\nAdmin Menu:\n";
         cout << "1. Show registered users\n";
@@ -218,7 +220,7 @@ void adminMenu(sqlite3* db) {
 }
 
 int main() {
-    
+
     sqlite3* db;
     if (sqlite3_open("voting_system.db", &db) != SQLITE_OK) {
         cerr << "Error opening database: " << sqlite3_errmsg(db) << endl;
