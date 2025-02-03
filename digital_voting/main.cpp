@@ -5,16 +5,13 @@
 
 using namespace std;
 
-// Linked List Node for storing Voter information
 struct VoterNode {
     string id;
     string name;
     VoterNode* next;
-
     VoterNode(const string& id, const string& name) : id(id), name(name), next(nullptr) {}
 };
 
-// Function to execute a query in the database
 bool execute(sqlite3* db, const string& query) {
     char* errMsg = nullptr;
     if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK) {
@@ -25,16 +22,12 @@ bool execute(sqlite3* db, const string& query) {
     return true;
 }
 
-// Linked List Operations
-
-// Add a new voter to the linked list
 void addVoter(VoterNode*& head, const string& id, const string& name) {
     VoterNode* newNode = new VoterNode(id, name);
     newNode->next = head;
     head = newNode;
 }
 
-// Check if a voter exists in the linked list
 bool voterExists(VoterNode* head, const string& id) {
     VoterNode* current = head;
     while (current != nullptr) {
@@ -46,21 +39,18 @@ bool voterExists(VoterNode* head, const string& id) {
     return false;
 }
 
-// Register a voter in the linked list and SQLite
 void registerVoter(sqlite3* db, VoterNode*& head, const string& id, const string& name) {
     if (voterExists(head, id)) {
         cout << "The user with this ID is already registered. Please proceed to voting.\n";
         return;
     }
     addVoter(head, id, name);
-
     string query = "INSERT INTO voters (id, name) VALUES ('" + id + "', '" + name + "');";
     if (execute(db, query)) {
         cout << "Registration successful!\n";
     }
 }
 
-// Function to check if a voter has already voted
 bool hasVoted(sqlite3* db, const string& id) {
     string query = "SELECT COUNT(*) FROM votes WHERE id='" + id + "';";
     sqlite3_stmt* stmt;
@@ -71,35 +61,29 @@ bool hasVoted(sqlite3* db, const string& id) {
     return voted;
 }
 
-// Function to vote for a party
 void vote(sqlite3* db, VoterNode* head, const string& id, const string& party) {
     if (party != "Prosperity" && party != "Ezema" && party != "Enat") {
         cout << "Invalid party name. Please choose from Prosperity, Ezema, or Enat.\n";
         return;
     }
-
     if (!voterExists(head, id)) {
         cout << "You are not registered! Please register first.\n";
         return;
     }
-
     if (hasVoted(db, id)) {
         cout << "You have already voted. Thank you!\n";
         return;
     }
-
     string query = "INSERT INTO votes (id, party) VALUES ('" + id + "', '" + party + "');";
     if (execute(db, query)) {
         cout << "Thank you for voting!\n";
     }
 }
 
-// Function to display registered users
 void displayRegisteredUsers(sqlite3* db) {
     string query = "SELECT * FROM voters;";
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
-
     cout << "ID -------- Name\n";
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         string id = (const char*)sqlite3_column_text(stmt, 0);
@@ -109,18 +93,15 @@ void displayRegisteredUsers(sqlite3* db) {
     sqlite3_finalize(stmt);
 }
 
-// Function to display votes for each party
 void displayVotes(sqlite3* db) {
     string query = "SELECT party, COUNT(*) FROM votes GROUP BY party;";
     sqlite3_stmt* stmt;
-
     if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         cerr << "Error preparing statement: " << sqlite3_errmsg(db) << endl;
         return;
     }
-    cout<<"1 for prosperity, 2 for ezema , 3 for enat party";
+    cout << "1 for prosperity, 2 for ezema , 3 for enat party";
     cout << "Party -------- Votes\n";
-
     bool hasResults = false;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         hasResults = true;
@@ -128,44 +109,34 @@ void displayVotes(sqlite3* db) {
         int votes = sqlite3_column_int(stmt, 1);
         cout << party << " -------- " << votes << "\n";
     }
-
     if (!hasResults) {
         cout << "No votes cast yet.\n";
     }
-
     sqlite3_finalize(stmt);
 }
 
-// Function to show the winner
 void showWinner(sqlite3* db) {
     string query = "SELECT party, COUNT(*) as count FROM votes GROUP BY party ORDER BY count DESC;";
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
-
     string partyWithMaxVotes;
     int maxVotes = -1;
     bool tie = false;
     string tiedParties = "";
-
-    // Iterate through the results
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         string party = (const char*)sqlite3_column_text(stmt, 0);
         int votes = sqlite3_column_int(stmt, 1);
-
         if (votes > maxVotes) {
             maxVotes = votes;
             partyWithMaxVotes = party;
-            tie = false;  // Reset tie flag when a new max is found
-            tiedParties = party;  // Start the tie list with this party
+            tie = false;
+            tiedParties = party;
         } else if (votes == maxVotes) {
-            tie = true;  // Indicate there's a tie
-            tiedParties += ", " + party;  // Add this party to the tie list
+            tie = true;
+            tiedParties += ", " + party;
         }
     }
-
     sqlite3_finalize(stmt);
-
-    // Handle the result: check if there's a tie or a clear winner
     if (tie) {
         cout << "There is a tie between the following parties: " << tiedParties << "\n";
     } else {
@@ -173,8 +144,6 @@ void showWinner(sqlite3* db) {
     }
 }
 
-
-// Voter interface
 void voterMenu(sqlite3* db, VoterNode*& head) {
     int choice;
     while (true) {
@@ -185,7 +154,6 @@ void voterMenu(sqlite3* db, VoterNode*& head) {
         cout << "Type your choice number: ";
         cin >> choice;
         cin.ignore();
-
         switch (choice) {
             case 1: {
                 string id, name;
@@ -213,18 +181,15 @@ void voterMenu(sqlite3* db, VoterNode*& head) {
     }
 }
 
-// Admin interface
 void adminMenu(sqlite3* db) {
     string password;
     cout << "Enter admin password: ";
     cin.ignore();
     getline(cin, password);
-
     if (password != "admin123") {
         cout << "Incorrect password.\n";
         return;
     }
-
     int choice;
     while (true) {
         cout << "\nAdmin Menu:\n";
@@ -234,7 +199,6 @@ void adminMenu(sqlite3* db) {
         cout << "4. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
-
         switch (choice) {
             case 1:
                 displayRegisteredUsers(db);
@@ -253,14 +217,12 @@ void adminMenu(sqlite3* db) {
     }
 }
 
-// Main function
 int main() {
     sqlite3* db;
     if (sqlite3_open("voting_system.db", &db) != SQLITE_OK) {
         cerr << "Error opening database: " << sqlite3_errmsg(db) << endl;
         return 1;
     }
-
     string createVoterTable = R"(
         CREATE TABLE IF NOT EXISTS voters (
             id TEXT PRIMARY KEY,
@@ -274,12 +236,9 @@ int main() {
             FOREIGN KEY(id) REFERENCES voters(id)
         );
     )";
-
     execute(db, createVoterTable);
     execute(db, createVotesTable);
-
-    VoterNode* head = nullptr; // Linked list for storing registered voters
-
+    VoterNode* head = nullptr;
     int choice;
     while (true) {
         cout << "\nWelcome! Who are you?\n";
@@ -287,7 +246,6 @@ int main() {
         cout << "2. Admin\n";
         cout << "Enter your choice: ";
         cin >> choice;
-
         switch (choice) {
             case 1:
                 voterMenu(db, head);
@@ -298,7 +256,6 @@ int main() {
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-
         string cont;
         cout << "Do you want to continue? (yes/no): ";
         cin >> cont;
@@ -307,7 +264,6 @@ int main() {
             break;
         }
     }
-
     sqlite3_close(db);
     return 0;
 }
