@@ -1,11 +1,10 @@
 
-```
 
 ---
 
 ### digitalVotingSystem.md
 
-```markdown
+
 # DIGITAL VOTING SYSTEM
 
 **Project Title:** DIGITAL VOTING SYSTEM  
@@ -29,7 +28,7 @@ This digital voting system allows users to register and cast their votes for one
 
 ## Project Structure
 
-```
+
 digital_voting/
 │
 ├── bin/
@@ -42,7 +41,7 @@ digital_voting/
 ├── sqlite3/                      # SQLite database files used by the project.
 │
 └── main.cpp                      # Main source code file (comments removed for production).
-```
+
 
 ## Features
 
@@ -92,7 +91,5 @@ digital_voting/
 
 
 ---
-
-```
 
 ---
