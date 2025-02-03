@@ -218,6 +218,7 @@ void adminMenu(sqlite3* db) {
 }
 
 int main() {
+    
     sqlite3* db;
     if (sqlite3_open("voting_system.db", &db) != SQLITE_OK) {
         cerr << "Error opening database: " << sqlite3_errmsg(db) << endl;
