@@ -145,6 +145,7 @@ void showWinner(sqlite3* db) {
 }
 
 void voterMenu(sqlite3* db, VoterNode*& head) {
+    
     int choice;
     while (true) {
         cout << "\nWelcome to the voting page\n";
@@ -192,7 +193,7 @@ void adminMenu(sqlite3* db) {
     }
 
     int choice;
-    
+
     while (true) {
         cout << "\nAdmin Menu:\n";
         cout << "1. Show registered users\n";
