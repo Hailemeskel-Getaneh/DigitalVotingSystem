@@ -2,7 +2,6 @@
 #include <string>
 #include "sqlite3.h"
 
-
 using namespace std;
 
 // Node structure for the linked list
@@ -13,13 +12,12 @@ struct VoterNode {
     VoterNode* next;
 };
 
-// Global head for linked list
-VoterNode* head = nullptr;
+VoterNode* head = NULL;
 
 // SQLite Execution Helper Function
 bool executeSQL(sqlite3* db, string query) {
-    char* errMsg = nullptr;
-    if (sqlite3_exec(db, query.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK) {
+    char* errMsg = NULL;
+    if (sqlite3_exec(db, query.c_str(), NULL, NULL, &errMsg) != SQLITE_OK) {
         cout << "SQL Error: " << errMsg << endl;
         sqlite3_free(errMsg);
         return false;
@@ -29,9 +27,9 @@ bool executeSQL(sqlite3* db, string query) {
 
 // Load all voters from the database into the linked list
 void loadVoters(sqlite3* db) {
-    string query = "SELECT id, name FROM voters;";  // Load voters without joining with votes
+    string query = "SELECT id, name FROM voters;";  
     sqlite3_stmt* stmt;
-    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         string id = (char*)sqlite3_column_text(stmt, 0);
@@ -41,26 +39,24 @@ void loadVoters(sqlite3* db) {
         VoterNode* newNode = new VoterNode;
         newNode->id = id;
         newNode->name = name;
-        newNode->party = "";  // Initially, no party selected
+        newNode->party = ""; 
         newNode->next = head;
         head = newNode;
     }
     sqlite3_finalize(stmt);
 
-    // Now load the party information (vote details) separately for each voter
     VoterNode* current = head;
-    query = "SELECT id, party FROM votes;";  // Get vote details
-    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+    query = "SELECT id, party FROM votes;";  
+    sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         string id = (char*)sqlite3_column_text(stmt, 0);
         string party = (char*)sqlite3_column_text(stmt, 1);
 
-        // Find the voter in the linked list and set the party
         current = head;
-        while (current != nullptr) {
+        while (current != NULL) {
             if (current->id == id) {
-                current->party = party;  // Set the party of the voter who voted
+                current->party = party; 
                 break;
             }
             current = current->next;
@@ -71,7 +67,7 @@ void loadVoters(sqlite3* db) {
 
 bool isVoterRegistered(string id) {
     VoterNode* current = head;
-    while (current != nullptr) {
+    while (current != NULL) {
         if (current->id == id) {
             return true;
         }
@@ -81,9 +77,9 @@ bool isVoterRegistered(string id) {
 }
 bool hasVoted(string id) {
     VoterNode* current = head;
-    while (current != nullptr) {
+    while (current != NULL) {
         if (current->id == id) {
-            return !current->party.empty();  // If party is empty, the voter hasn't voted
+            return !current->party.empty();  
         }
         current = current->next;
     }
@@ -97,7 +93,7 @@ void addVoter(sqlite3* db, string id, string name) {
     VoterNode* newNode = new VoterNode;
     newNode->id = id;
     newNode->name = name;
-    newNode->party = "";  // Initially, no party selected
+    newNode->party = "";  
     newNode->next = head;
     head = newNode;
 
@@ -111,25 +107,21 @@ void addVoter(sqlite3* db, string id, string name) {
 void showRegisteredVoters() {
     VoterNode* current = head;
 
-    // Header with simple shapes
     cout << "\n+----------------------------------------------------+" << endl;
     cout << "|            Registered Voters                        |" << endl;
     cout << "+------------------------------------------------------+" << endl;
     cout << "|       ID   |           Name           |    Party    |" << endl;
     cout << "+------------------------------------------------------+" << endl;
 
-    // Loop through the linked list and print each voter
-    while (current != nullptr) {
-        // Print each voter's details
+    while (current != NULL) {
         cout << "| "
-             << "  "  << current->id    // ID
-             << "  | " << "\t" << current->name    // Name
+             << "  "  << current->id    
+             << "  | " << "\t" << current->name   
              << "| " << "\t\t  " << (current->party.empty() ? "Not Voted Yet" : current->party)  // Party
              << " |" << endl;
         current = current->next;
     }
 
-    // Footer with simple shapes
     cout << "+-----------------------------------------+" << endl;
 }
 
@@ -137,27 +129,22 @@ void showRegisteredVoters() {
 void showVotedUsers() {
     VoterNode* current = head;
 
-    // Header with simple shapes
     cout << "\n+--------------------------------------------+" << endl;
     cout << "|           Voters Who Have Voted           |" << endl;
     cout << "+--------------------------------------------+" << endl;
     cout << "|   ID   |           Name           |    Party    |" << endl;
     cout << "+--------------------------------------------+" << endl;
 
-    // Loop through the linked list and print each voter who has voted
-    while (current != nullptr) {
+    while (current != NULL) {
         if (!current->party.empty()) {
-            // Manually spacing each part to align the columns
             cout << "| " << current->id;
 
-            // Add spaces for ID to align with "Name" column (make sure this length is the same for each ID)
             for (int i = current->id.length(); i < 6; i++) {
                 cout << " ";
             }
 
             cout << "| " << current->name;
 
-            // Add spaces for Name to align with "Party" column (make sure this length is the same for each Name)
             for (int i = current->name.length(); i < 20; i++) {
                 cout << " ";
             }
@@ -167,7 +154,6 @@ void showVotedUsers() {
         current = current->next;
     }
 
-    // Footer with simple shapes
     cout << "+--------------------------------------------+" << endl;
 }
 
@@ -175,7 +161,7 @@ void showVotedUsers() {
 // Sort voters by name using bubble sort on the linked list
 void sortVotersByName() {
     if (!head || !head->next) {
-        return;  // No need to sort if there's only one or no voter
+        return;  
     }
 
     bool swapped;
@@ -184,7 +170,6 @@ void sortVotersByName() {
         VoterNode* current = head;
         while (current && current->next) {
             if (current->name > current->next->name) {
-                // Swap the data, not the nodes themselves
                 string tempId = current->id;
                 string tempName = current->name;
                 string tempParty = current->party;
@@ -213,9 +198,8 @@ void searchVoterById(string id) {
     bool found = false;
 
     // Search for the voter by ID
-    while (current != nullptr) {
+    while (current != NULL) {
         if (current->id == id) {
-            // If voter is found, display details in a formatted way
             cout << "\n+-----------------------------------------------+" << endl;
             cout << "|           Voter Found by ID: " << id << "           |" << endl;
             cout << "+-----------------------------------------------+" << endl;
@@ -256,15 +240,15 @@ void searchVoterById(string id) {
 // Delete voter by ID (from both linked list and database)
 void deleteVoter(sqlite3* db, string id) {
     VoterNode* current = head;
-    VoterNode* previous = nullptr;
+    VoterNode* previous = NULL;
 
-    while (current != nullptr && current->id != id) {
+    while (current != NULL && current->id != id) {
         previous = current;
         current = current->next;
     }
 
-    if (current != nullptr) {
-        if (previous == nullptr) {
+    if (current != NULL) {
+        if (previous == NULL) {
             head = current->next;  // Delete the head node
         } else {
             previous->next = current->next;
@@ -324,7 +308,7 @@ void userMenu(sqlite3* db) {
             }
 
             VoterNode* current = head;
-            while (current != nullptr) {
+            while (current != NULL) {
                 if (current->id == id) {
                     current->party = party;
                     string query = "INSERT INTO votes (id, party) VALUES ('" + id + "', '" + party + "');";
@@ -394,7 +378,7 @@ void adminMenu(sqlite3* db) {
             case 6: {
                 string query = "SELECT party, COUNT(*) FROM votes GROUP BY party ORDER BY COUNT(*) DESC;";
                 sqlite3_stmt* stmt;
-                sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr);
+                sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
 
                 int maxVotes = 0;
                 string winnerParty;
@@ -440,6 +424,7 @@ int main() {
     }
 
     // Create tables if they do not exist
+
     string createVoterTable = "CREATE TABLE IF NOT EXISTS voters (id TEXT PRIMARY KEY, name TEXT);";
     string createVotesTable = "CREATE TABLE IF NOT EXISTS votes (id TEXT, party TEXT, FOREIGN KEY(id) REFERENCES voters(id));";
     executeSQL(db, createVoterTable);
@@ -469,7 +454,7 @@ int main() {
                 adminMenu(db);
                 break;
             case 3:
-                return 0; // Exits the program
+                return 0; 
             default:
                 cout << "Invalid choice, please try again." << endl;
         }
