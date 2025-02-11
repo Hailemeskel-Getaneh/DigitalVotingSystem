@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1739219997 source:c:\dv\main.cpp
+	<iostream>
+	<string>
+	"sqlite3.h"
+
+1738850358 c:\dv\sqlite3.h
+	<stdarg.h>
+
