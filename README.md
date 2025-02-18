@@ -24,7 +24,7 @@ Welcome to the Digital Voting System project repository! This project is designe
 
 ## Overview
 
-This digital voting system allows users to register and cast their votes for one of three parties : **Prosperity**, **Ezema**, or **Enat**. It is possible to add parites and these are for sample. Administrators have exclusive access to review registered users, vote counts per party, and determine the winning party. The system uses SQLite for storing voter and vote data and employs linked lists for in-memory management of registered voters.
+This digital voting system allows users to register and cast their votes for one of the listed parties It is possible to add parites and these are for sample. Administrators have exclusive access to review registered users, vote counts per party, and determine the winning party. add new parties, search, display and deleter voters. The system uses SQLite for storing voter and vote data and employs linked lists for in-memory management of registered voters.
 
 ## Project Structure
 
